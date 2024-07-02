@@ -2,26 +2,8 @@ import axios  from "axios";
 
 class WantBase {
   constructor() {
-    const dotenv = require('dotenv');
-    const path = require('path');
-    
-    dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
-    
-    const project = process.env.WANTED_PROJECT;
-    const apiKey = process.env.WANTED_API_KEY;
-    this.header = {
-      project: project,
-      apiKey: apiKey,
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-    };
 
-    this.apiUrl = "http://localhost:9000";
-    this.messages = [];
-    this.params = {};
+    this.apiUrl = "http://59.5.15.36:22006";
   }
 }
 
