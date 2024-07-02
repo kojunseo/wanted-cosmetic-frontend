@@ -2,8 +2,8 @@ import axios  from "axios";
 
 class WantBase {
   constructor() {
-
-    this.apiUrl = "http://59.5.15.36:22006";
+    this.apiUrl = "http://localhost:9000";
+    // this.apiUrl = "http://59.5.15.36:22006";
   }
 }
 
@@ -32,7 +32,6 @@ class WantedChatCompletions extends WantBase {
     const response = await axios.post(
       this.apiUrl+"/keyword", body
     );
-    console.log(response);
     const out = response.data.data;
     return out;
   }
@@ -46,6 +45,18 @@ class WantedChatCompletions extends WantBase {
       this.apiUrl+"/context", body
     );
     const out = response.data.data;
+    return out;
+  }
+  
+  async get_community(index) {
+    const body = {
+      keyword: index
+    };
+
+    const response = await axios.post(
+      this.apiUrl+"/community", body
+    );
+    const out = response.data;
     return out;
   }
 }
