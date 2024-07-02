@@ -59,5 +59,16 @@ class WantedChatCompletions extends WantBase {
     const out = response.data;
     return out;
   }
+
+  async get_news(index){
+    const body = {
+      keyword: index
+    };
+    const response = await axios.post(
+      this.apiUrl+"/news", body
+    );
+    const out = response.data;
+    return out;
+  }
 }
 export default WantedChatCompletions;

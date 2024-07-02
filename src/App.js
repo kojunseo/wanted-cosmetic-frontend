@@ -18,6 +18,7 @@ function App() {
   const [random1, setRandom1] = useState('');
   const [random2, setRandom2] = useState('');
   const [related_question, setRelatedQuestion] = useState('');
+  const [news, setNews] = useState('');
   
   
 
@@ -49,7 +50,12 @@ function App() {
 
     setStatus('관련된 수술을 찾고 있습니다.');
     const keyword = await search_keyword_chain.completions([], {question: userQuestion});
-    if (keyword === "33"){
+    setCommunity('')
+    setNews('')
+    setRelatedQuestion('')
+    setAnswer('')
+
+    if (keyword === "33" || keyword==" "){
       // 질문이 잘못된 경우
       setStatus("잘못된 질문입니다. 다시 입력해주세요.");
       document.getElementById('loading-status').classList.remove('px-3');
@@ -58,8 +64,31 @@ function App() {
       document.getElementById('howabout-title').classList.remove('hidden');
       return;
     }
+    console.log(keyword)
+    const keyword_name = await search_keyword_chain.get_keyword(keyword);
+    setStatus(`'${keyword_name}'와 관련된 정보를 수집 중 있습니다.`);
+    
+    const news_out = await search_keyword_chain.get_news(keyword);
+    console.log(news_out)
+    setNews(
+      <div>
+        <div onClick={() => window.open(news_out.links[0], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
+          <p className='text-md font-semibold'>{news_out.titles[0]}</p>
+          <p className='text-sm pt-1 font-light'>요약내용: {news_out.result[0]}</p>
+        </div>
+        <div onClick={() => window.open(news_out.links[1], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
+          <p className='text-md font-semibold'>{news_out.titles[1]}</p>
+          <p className='text-sm pt-1 font-light'>요약내용: {news_out.result[1]}</p>
+        </div>
+        <div onClick={() => window.open(news_out.links[2], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
+          <p className='text-md font-semibold'>{news_out.titles[2]}</p>
+          <p className='text-sm pt-1 font-light'>요약내용: {news_out.result[2]}</p>
+        </div>   
+      </div>
+    )
 
     const community = await search_keyword_chain.get_community(keyword);
+    document.getElementById('answer').classList.remove('hidden');
     setCommunity(
       <div>
         <div onClick={() => window.open(community.links[0], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
@@ -73,22 +102,22 @@ function App() {
         <div onClick={() => window.open(community.links[2], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
           <p className='text-md font-semibold'>{community.titles[2]}</p>
           <p className='text-sm pt-1 font-light'>요약내용: {community.result[2]}</p>
-        </div>
-        
+        </div>   
       </div>
     )
-    const keyword_name = await search_keyword_chain.get_keyword(keyword);
+    
+    
     const document_index = await document_index_search_chain.completions([], {question: userQuestion});
     const context = await document_index_search_chain.get_context(keyword, document_index);
     
-    setStatus(`'${keyword_name}'와 관련된 정보를 수집 중 있습니다.`);
+    
     const coord_answer = await generation_chain.completions([], {"question": userQuestion, "context": context})
     setStatus(`코디네이터의 '${keyword_name}'에 대한 내용을 정리 중 입니다.`);
 
     const related_question = await related_question_chain.completions([], {"question": userQuestion, "context": context})
     
     document.getElementById('loading').classList.add('hidden');
-    document.getElementById('answer').classList.remove('hidden');
+    
     setAnswer(<p className='text-md'>{coord_answer}</p>)
     
 
@@ -157,6 +186,8 @@ function App() {
             {answer}
             <p className='font-bold text-xl pb-2 pt-7'>다른 사람들의 커뮤니티의 의견을 들어볼까요?</p>
             {community}
+            <p className='font-bold text-xl pb-2 pt-7'>다음과 같은 뉴스를 확인해볼 수 있어요.</p>
+            {news}
             <p className='font-bold text-xl pb-2 pt-7'>다음과 같은 질문을 해볼 수 있어요.</p>
             {related_question}
           </div>
