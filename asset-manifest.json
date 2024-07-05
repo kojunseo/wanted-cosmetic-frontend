@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/wanted-cosmetic-frontend/static/css/main.c540574c.css",
-    "main.js": "/wanted-cosmetic-frontend/static/js/main.6935bff7.js",
+    "main.css": "/wanted-cosmetic-frontend/static/css/main.49e30742.css",
+    "main.js": "/wanted-cosmetic-frontend/static/js/main.0d3baa1e.js",
     "static/js/453.1e40ad5c.chunk.js": "/wanted-cosmetic-frontend/static/js/453.1e40ad5c.chunk.js",
     "index.html": "/wanted-cosmetic-frontend/index.html",
-    "main.c540574c.css.map": "/wanted-cosmetic-frontend/static/css/main.c540574c.css.map",
-    "main.6935bff7.js.map": "/wanted-cosmetic-frontend/static/js/main.6935bff7.js.map",
+    "main.49e30742.css.map": "/wanted-cosmetic-frontend/static/css/main.49e30742.css.map",
+    "main.0d3baa1e.js.map": "/wanted-cosmetic-frontend/static/js/main.0d3baa1e.js.map",
     "453.1e40ad5c.chunk.js.map": "/wanted-cosmetic-frontend/static/js/453.1e40ad5c.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.c540574c.css",
-    "static/js/main.6935bff7.js"
+    "static/css/main.49e30742.css",
+    "static/js/main.0d3baa1e.js"
   ]
 }
