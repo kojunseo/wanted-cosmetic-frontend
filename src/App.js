@@ -20,7 +20,9 @@ function App() {
   const [related_question, setRelatedQuestion] = useState('');
   const [news, setNews] = useState('');
   
-  
+  var context = '';
+  var keyword = '';
+  var keyword_name = '';
 
 
   useEffect(() => {
@@ -40,6 +42,8 @@ function App() {
 
   const handleSearch = async () => {
     // remove the howabout div hidden
+    document.getElementById('search-button').classList.add('hidden');
+    document.getElementById('search-input').classList.add('disabled');
     document.getElementById('howabout').classList.add('hidden');
     document.getElementById('howabout-title').classList.add('hidden');
     document.getElementById('loading').classList.remove('hidden');
@@ -49,23 +53,29 @@ function App() {
 
 
     setStatus('관련된 수술을 찾고 있습니다.');
-    const keyword = await search_keyword_chain.completions([], {question: userQuestion});
-    setCommunity('')
-    setNews('')
-    setRelatedQuestion('')
-    setAnswer('')
-
-    if (keyword === "33" || keyword==" "){
+    setAnswer('답변 준비 중 입니다.')
+    keyword = await search_keyword_chain.completions([], {question: userQuestion});
+    if (keyword === "33" || keyword===" "){
       // 질문이 잘못된 경우
       setStatus("잘못된 질문입니다. 다시 입력해주세요.");
       document.getElementById('loading-status').classList.remove('px-3');
       document.getElementById('loading-spinner').classList.add('hidden');
       document.getElementById('howabout').classList.remove('hidden');
       document.getElementById('howabout-title').classList.remove('hidden');
+      document.getElementById('search-button').classList.remove('hidden');
       return;
     }
+    
+    const document_index = await document_index_search_chain.completions([], {question: userQuestion});
+    context = await document_index_search_chain.get_context(keyword, document_index);
+    setCommunity('')
+    setNews('')
+    setRelatedQuestion('')
+    setAnswer('')
+
+    
     console.log(keyword)
-    const keyword_name = await search_keyword_chain.get_keyword(keyword);
+    keyword_name = await search_keyword_chain.get_keyword(keyword);
     setStatus(`'${keyword_name}'와 관련된 정보를 수집 중 있습니다.`);
     
     const news_out = await search_keyword_chain.get_news(keyword);
@@ -89,6 +99,8 @@ function App() {
 
     const community = await search_keyword_chain.get_community(keyword);
     document.getElementById('answer').classList.remove('hidden');
+    document.getElementById('top-screen').classList.remove('md:h-screen');
+    document.getElementById('top-screen').classList.add('pt-12');
     setCommunity(
       <div>
         <div onClick={() => window.open(community.links[0], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
@@ -105,11 +117,6 @@ function App() {
         </div>   
       </div>
     )
-    
-    
-    const document_index = await document_index_search_chain.completions([], {question: userQuestion});
-    const context = await document_index_search_chain.get_context(keyword, document_index);
-    
     
     const coord_answer = await generation_chain.completions([], {"question": userQuestion, "context": context})
     setStatus(`코디네이터의 '${keyword_name}'에 대한 내용을 정리 중 입니다.`);
@@ -134,6 +141,8 @@ function App() {
         <p id="howabout2" className='px-2 bg-emerald-50 border-1 p-1 my-2 rounded-lg hover:bg-emerald-100 active:bg-emerald-200' onClick={() => handleRelatedQuestionClick(related_question_array[1])}>{related_question_array[1]}</p>
       </div>
     )
+    document.getElementById('search-button').classList.remove('hidden');
+    document.getElementById('search-input').classList.remove('hidden');
   };
     
 
@@ -142,33 +151,51 @@ function App() {
       handleSearch();
     }
   };
+  function ScrollTop(){
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  }
 
-  const handleRelatedQuestionClick = (text) => {
-    document.getElementById('howabout').classList.add('hidden');
-    document.getElementById('howabout-title').classList.add('hidden');
-    // document.getElementById('answer').classList.add('hidden');
-    document.getElementById('loading').classList.add('hidden');
+  const handleRelatedQuestionClick = async (text) => {
     setUserQuestion(text);
+    setAnswer('답변 준비 중 입니다.')
+    document.getElementById('search-button').classList.add('hidden');
+    document.getElementById('search-input').classList.add('disabled');
+    ScrollTop()
+    document.getElementById('loading').classList.remove('hidden');
+    document.getElementById('loading-spinner').classList.remove('hidden');
+    document.getElementById('loading-status').classList.add('px-3');
+    
+    const coord_answer = await generation_chain.completions([], {"question": text, "context": context})
+    
+    setStatus(`코디네이터가 추가 질문에 대한 답변을 준비하는 중입니다.`);
+    
+    document.getElementById('loading').classList.add('hidden');
+    setAnswer(<p className='text-md'>{coord_answer}</p>)
+    document.getElementById('search-button').classList.remove('hidden');
+    document.getElementById('search-input').classList.remove('hidden');
   };
+
 
   const handleHowAboutClick = (text) => {
     document.getElementById('howabout').classList.remove('hidden');
     document.getElementById('howabout-title').classList.remove('hidden');
-    // document.getElementById('answer').classList.add('hidden');
     document.getElementById('loading').classList.add('hidden');
     setUserQuestion(text);
   };
 
   return (
-    <div className='flex flex-col items-center justify-center md:h-screen bg-gradient-to-b from-slate-50 to-emerald-50'>
+    <div className='flex flex-col items-center justify-center md:h-screen bg-gradient-to-b from-slate-50 to-emerald-50' id="top-screen">
       <div className='w-full md:w-2/3 bg-white rounded-lg p-8 md:p-20'>
         <div className='flex'>
           <img src={logo} alt="logo" className='w-10 h-10'/>
           <h1 className='text-2xl font-bold px-2'>나만의 성형 코디네이터</h1>
         </div>
         <div className='flex items-center justify-center'>
-          <input className='p-2 m-2 w-full rounded-md border-2 border-gray-300 click:border-emerald-500' type="text" value={userQuestion} onChange={(e) => setUserQuestion(e.target.value)} onKeyPress={handleKeyPress} />
-          <button className='p-2 m-2 w-20 rounded-md bg-emerald-500 text-white' onClick={handleSearch}>검색</button>
+          <input className='p-2 m-2 w-full rounded-md border-2 border-gray-300 click:border-emerald-500' type="text" value={userQuestion} onChange={(e) => setUserQuestion(e.target.value)} onKeyPress={handleKeyPress} id="search-input" />
+          <button id="search-button" className='p-2 m-2 w-20 rounded-md bg-emerald-500 text-white' onClick={handleSearch}>검색</button>
         </div>
         <div className='pt-5'>
           <div className='pt-3'>
