@@ -19,6 +19,10 @@ function App() {
   const [random2, setRandom2] = useState('');
   const [related_question, setRelatedQuestion] = useState('');
   const [news, setNews] = useState('');
+  const [cost, setCost] = useState('');
+  
+
+
   
   var context = '';
   var keyword = '';
@@ -33,8 +37,10 @@ function App() {
       "쌍커풀 수술의 효과가 어떻게 되나요?",
       "눈매 교정술을 하기전 주의 사항을 알려주세요.",
       "과도한 다이어트 이후, 살이 너무 쳐졌어요.",
+      "지방흡입의 비용은 어떻게 되나요?"
     ];
     var randomIndex1 = Math.floor(Math.random() * (randomQuestion.length-1)) + 1;
+    console.log(randomIndex1)
     setRandom1(randomQuestion[randomIndex1]);
     setRandom2(randomQuestion[randomIndex1-1]);
   }, []);
@@ -50,6 +56,7 @@ function App() {
     document.getElementById('loading-spinner').classList.remove('hidden');
     document.getElementById('loading-status').classList.add('px-3');
     document.getElementById('answer').classList.add('hidden');
+    document.getElementById('cost-container').classList.add('hidden');
 
 
     setStatus('관련된 수술을 찾고 있습니다.');
@@ -57,7 +64,7 @@ function App() {
     keyword = await search_keyword_chain.completions([], {question: userQuestion});
     if (keyword === "33" || keyword===" "){
       // 질문이 잘못된 경우
-      setStatus("잘못된 질문입니다. 다시 입력해주세요.");
+      setStatus("해당 질문은 성형관련 질문이 아니거나, 답변할 수 없는 질문입니다. 다른 질문을 입력해주세요.");
       document.getElementById('loading-status').classList.remove('px-3');
       document.getElementById('loading-spinner').classList.add('hidden');
       document.getElementById('howabout').classList.remove('hidden');
@@ -71,15 +78,12 @@ function App() {
     setCommunity('')
     setNews('')
     setRelatedQuestion('')
-    setAnswer('')
 
     
-    console.log(keyword)
     keyword_name = await search_keyword_chain.get_keyword(keyword);
     setStatus(`'${keyword_name}'와 관련된 정보를 수집 중 있습니다.`);
     
     const news_out = await search_keyword_chain.get_news(keyword);
-    console.log(news_out)
     setNews(
       <div>
         <div onClick={() => window.open(news_out.links[0], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
@@ -99,8 +103,20 @@ function App() {
 
     const community = await search_keyword_chain.get_community(keyword);
     document.getElementById('answer').classList.remove('hidden');
+    setAnswer(
+      <div className='flex my-3 space-x-1' id='loading-spinner'>
+        <div className='h-2 w-2 bg-emerald-600 rounded-full animate-bounce [animation-delay:-0.3s]'></div>
+        <div className='h-2 w-2 bg-emerald-600 rounded-full animate-bounce [animation-delay:-0.15s]'></div>
+        <div className='h-2 w-2 bg-emerald-600 rounded-full animate-bounce'></div>
+      </div>
+    )
     document.getElementById('top-screen').classList.remove('md:h-screen');
-    document.getElementById('top-screen').classList.add('pt-12');
+    document.getElementById('top-screen').classList.add('md:py-8');
+    document.getElementById('top-screen-inner').classList.remove('md:p-16');
+    document.getElementById('top-screen-inner').classList.add('md:px-20');
+    document.getElementById('top-screen-inner').classList.add('md:py-8');
+    
+    
     setCommunity(
       <div>
         <div onClick={() => window.open(community.links[0], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
@@ -119,14 +135,24 @@ function App() {
     )
     
     const coord_answer = await generation_chain.completions([], {"question": userQuestion, "context": context})
-    setStatus(`코디네이터의 '${keyword_name}'에 대한 내용을 정리 중 입니다.`);
+    setStatus(`코디네이터가 '${keyword_name}'에 대한 내용을 정리 중 입니다.`);
 
     const related_question = await related_question_chain.completions([], {"question": userQuestion, "context": context})
     
     document.getElementById('loading').classList.add('hidden');
-    
-    setAnswer(<p className='text-md'>{coord_answer}</p>)
-    
+    ScrollTop();
+    var out = '';
+    for (let i = 0; i < coord_answer.length; i++){
+      out += coord_answer[i];
+      setAnswer(out)
+      await new Promise(resolve => setTimeout(resolve, 5));
+    }
+
+    if (! coord_answer.includes("만원")){
+      document.getElementById('cost-container').classList.remove('hidden');
+      const cost_out = await generation_chain.get_cost(keyword);
+      setCost(cost_out);
+    }
 
     const related_question_array = related_question.split('\n');
     for (let i = 0; i < related_question_array.length; i++){
@@ -135,6 +161,7 @@ function App() {
         related_question_array[i] = related_question_array[i].slice(2);
       }
     }
+    
     setRelatedQuestion(
       <div>
         <p id="howabout1" className='px-2 bg-emerald-50 border-1 p-1 my-2 rounded-lg hover:bg-emerald-100 active:bg-emerald-200' onClick={() => handleRelatedQuestionClick(related_question_array[0])}>{related_question_array[0]}</p>
@@ -160,7 +187,13 @@ function App() {
 
   const handleRelatedQuestionClick = async (text) => {
     setUserQuestion(text);
-    setAnswer('답변 준비 중 입니다.')
+    setAnswer(
+      <div className='flex my-3 space-x-1' id='loading-spinner'>
+        <div className='h-2 w-2 bg-emerald-600 rounded-full animate-bounce [animation-delay:-0.3s]'></div>
+        <div className='h-2 w-2 bg-emerald-600 rounded-full animate-bounce [animation-delay:-0.15s]'></div>
+        <div className='h-2 w-2 bg-emerald-600 rounded-full animate-bounce'></div>
+      </div>
+    )
     document.getElementById('search-button').classList.add('hidden');
     document.getElementById('search-input').classList.add('disabled');
     ScrollTop()
@@ -168,12 +201,23 @@ function App() {
     document.getElementById('loading-spinner').classList.remove('hidden');
     document.getElementById('loading-status').classList.add('px-3');
     
-    const coord_answer = await generation_chain.completions([], {"question": text, "context": context})
-    
     setStatus(`코디네이터가 추가 질문에 대한 답변을 준비하는 중입니다.`);
-    
+    const coord_answer = await generation_chain.completions([], {"question": text, "context": context})
     document.getElementById('loading').classList.add('hidden');
-    setAnswer(<p className='text-md'>{coord_answer}</p>)
+    ScrollTop();
+    var out = '';
+    for (let i = 0; i < coord_answer.length; i++){
+      out += coord_answer[i];
+      setAnswer(out)
+      await new Promise(resolve => setTimeout(resolve, 5));
+    }
+    
+    
+    // setAnswer(
+    //   <div className='rounded-lg bg-emerald-50 p-2'>
+    //     <p className='text-lg'>{coord_answer}</p>
+    //   </div>
+    // )
     document.getElementById('search-button').classList.remove('hidden');
     document.getElementById('search-input').classList.remove('hidden');
   };
@@ -188,7 +232,7 @@ function App() {
 
   return (
     <div className='flex flex-col items-center justify-center md:h-screen bg-gradient-to-b from-slate-50 to-emerald-50' id="top-screen">
-      <div className='w-full md:w-2/3 bg-white rounded-lg p-8 md:p-20'>
+      <div className='w-full md:w-2/3 bg-white rounded-lg p-8 md:p-20' id='top-screen-inner'>
         <div className='flex'>
           <img src={logo} alt="logo" className='w-10 h-10'/>
           <h1 className='text-2xl font-bold px-2'>나만의 성형 코디네이터</h1>
@@ -209,13 +253,26 @@ function App() {
             </div>
           </div>
           <div id='answer' className='m-2 p-4 md:p-10 border-2 border-emerald-500 rounded-lg hidden'>
-            <p className='font-bold text-xl pb-2'>AI 코디네이터가 작성한 의견입니다.</p>
-            {answer}
-            <p className='font-bold text-xl pb-2 pt-7'>다른 사람들의 커뮤니티의 의견을 들어볼까요?</p>
+
+            <p className='font-bold text-xl md:text-2xl pb-2'>AI 코디네이터가 작성한 의견입니다.</p>
+            <div className='rounded-lg bg-emerald-50 border-2 border-emerald-600 p-3'>
+              <p className='text-md md:text-lg '>{answer}</p>
+            </div>
+            <p className='text-xs text-gray-5000 pt-2'>본 의견은 성형미용가이드북에 기반하여 인공지능을 통해 생성된 답변임으로 정확하지 않을 수 있습니다.</p>
+            <div id="cost-container">
+              <p className='font-bold text-lg pb-2 pt-8'>예상 수술 가격</p>
+              <div className='bg-emerald-50 rounded-lg p-2'>
+                <p className='text-md md:text-lg'>{cost}</p>
+              </div>
+              <p className='text-xs text-gray-5000'>정확한 비용은 병원의 상담을 통해 확인하는 것이 좋습니다.</p>
+              
+            </div>
+
+            <p className='font-bold text-lg pb-2 pt-24'>다른 사람들의 커뮤니티의 의견을 들어볼까요?</p>
             {community}
-            <p className='font-bold text-xl pb-2 pt-7'>다음과 같은 뉴스를 확인해볼 수 있어요.</p>
+            <p className='font-bold text-lg pb-2 pt-7'>다음과 같은 뉴스를 확인해볼 수 있어요.</p>
             {news}
-            <p className='font-bold text-xl pb-2 pt-7'>다음과 같은 질문을 해볼 수 있어요.</p>
+            <p className='font-bold text-lg pb-2 pt-7'>다음과 같은 질문을 해볼 수 있어요.</p>
             {related_question}
           </div>
 

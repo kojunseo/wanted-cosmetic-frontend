@@ -2,7 +2,7 @@ import axios  from "axios";
 
 class WantBase {
   constructor() {
-    this.apiUrl = "http://localhost:9000";
+    this.apiUrl = "http://kojunseo.duckdns.org:9000";
     // this.apiUrl = "http://59.5.15.36:22006";
   }
 }
@@ -21,6 +21,7 @@ class WantedChatCompletions extends WantBase {
     const response = await axios.post(
       this.apiUrl+"/api", body
     );
+    console.log(response);
     const out = response.data.choices[0].message.content;
     return out;
   }
@@ -68,6 +69,17 @@ class WantedChatCompletions extends WantBase {
       this.apiUrl+"/news", body
     );
     const out = response.data;
+    return out;
+  }
+
+  async get_cost(index){
+    const body = {
+      keyword: index
+    };
+    const response = await axios.post(
+      this.apiUrl+"/cost", body
+    );
+    const out = response.data.data;
     return out;
   }
 }
