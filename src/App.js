@@ -6,7 +6,7 @@ import logo from './logo.png';
 
 function App() {
   
-  const search_keyword_chain = new WantedChatCompletions("f803a97aa734c16ded979d5b176389bf80b7bd2230ee5c49ef94dd6c7df8cae2");
+  const search_keyword_chain = new WantedChatCompletions("01db023f6eccac2735b78757f1531f0a7be32d8e5a9d796ca69aa4a742b5da5f");
   const document_index_search_chain = new WantedChatCompletions("1cbab7a71f89a0f4a1874c9b0c8abdc829164e44254614b856f8013d0c6d1bc5",);
   const generation_chain = new WantedChatCompletions("47df1957fb5093fc089887263481f3a4ab1551fc1ea5dcbe29ba27c8f3d30241");
   const related_question_chain = new WantedChatCompletions("571813f290f28d1fefd3964999d91198fc79621d63e7855f8ef8993e72285209");
