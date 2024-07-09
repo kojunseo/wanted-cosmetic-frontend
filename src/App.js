@@ -4,6 +4,7 @@ import WantedChatCompletions from './wantedpt';
 import logo from './logo.png';
 
 
+
 function App() {
   
   const search_keyword_chain = new WantedChatCompletions("01db023f6eccac2735b78757f1531f0a7be32d8e5a9d796ca69aa4a742b5da5f");
@@ -48,6 +49,8 @@ function App() {
 
   const handleSearch = async () => {
     // remove the howabout div hidden
+    document.getElementById('top-screen-inner').classList.add('md:p-16');
+    document.getElementById('top-screen').classList.add('md:h-screen');
     document.getElementById('search-button').classList.add('hidden');
     document.getElementById('search-input').classList.add('disabled');
     document.getElementById('howabout').classList.add('hidden');
@@ -150,7 +153,22 @@ function App() {
 
     if (! coord_answer.includes("만원")){
       document.getElementById('cost-container').classList.remove('hidden');
-      const cost_out = await generation_chain.get_cost(keyword);
+      const cost_text = await generation_chain.get_cost(keyword);
+      const cost_text_array = cost_text.split('\n');
+      const cost_out = [];
+      for (let i = 0; i < cost_text_array.length; i++){
+        if (cost_text_array[i] === "") continue;
+        // <p className='text-md md:text-lg'>{cost_text[i]}</p>
+        const title = cost_text_array[i].split(":")[0];
+        const cost = cost_text_array[i].split(":")[1];
+        cost_out.push(
+          <div className='flex my-2 space-x-1'>
+            <p className='text-md font-semibold'>{title}:</p>
+            <p className='text-md'>{cost}</p>
+          </div>
+        )
+        // cost_out.push(<p className='text-md md:text-lg font-semibold'>{cost}</p>)
+      }
       setCost(cost_out);
     }
 
@@ -262,7 +280,8 @@ function App() {
             <div id="cost-container">
               <p className='font-bold text-lg pb-2 pt-8'>예상 수술 가격</p>
               <div className='bg-emerald-50 rounded-lg p-2'>
-                <p className='text-md md:text-lg'>{cost}</p>
+                {cost}
+                {/* <p className='text-md md:text-lg'>{cost}</p> */}
               </div>
               <p className='text-xs text-gray-5000'>정확한 비용은 병원의 상담을 통해 확인하는 것이 좋습니다.</p>
               
