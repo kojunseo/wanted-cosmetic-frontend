@@ -84,7 +84,7 @@ function App() {
 
     
     keyword_name = await search_keyword_chain.get_keyword(keyword);
-    setStatus(`'${keyword_name}'와 관련된 정보를 수집 중 있습니다.`);
+    setStatus(`'${keyword_name}'와 관련된 정보를 수집 중입니다.`);
     
     const news_out = await search_keyword_chain.get_news(keyword);
     setNews(
@@ -271,28 +271,31 @@ function App() {
             </div>
           </div>
           <div id='answer' className='m-2 p-4 md:p-10 border-2 border-emerald-500 rounded-lg hidden'>
-
+            <div className='pb-12'>
+            
             <p className='font-bold text-xl md:text-2xl pb-2'>AI 코디네이터가 작성한 의견입니다.</p>
             <div className='rounded-lg bg-emerald-50 border-2 border-emerald-600 p-3'>
               <p className='text-md md:text-lg '>{answer}</p>
             </div>
-            <p className='text-xs text-gray-5000 pt-2'>본 의견은 성형미용가이드북에 기반하여 인공지능을 통해 생성된 답변임으로 정확하지 않을 수 있습니다.</p>
+            <p className='text-xs text-gray-500 pt-2'>본 의견은 성형미용가이드북에 기반하여 인공지능을 통해 생성된 답변임으로 정확하지 않을 수 있습니다.</p>
             <div id="cost-container">
               <p className='font-bold text-lg pb-2 pt-8'>예상 수술 가격</p>
               <div className='bg-emerald-50 rounded-lg p-2'>
                 {cost}
                 {/* <p className='text-md md:text-lg'>{cost}</p> */}
               </div>
-              <p className='text-xs text-gray-5000'>정확한 비용은 병원의 상담을 통해 확인하는 것이 좋습니다.</p>
               
             </div>
+            </div>        
 
-            <p className='font-bold text-lg pb-2 pt-24'>다른 사람들의 커뮤니티의 의견을 들어볼까요?</p>
+            <p className='font-bold text-lg pb-2 pt-16 border-t-2 border-t-emerald-100'>다른 사람들의 커뮤니티의 의견을 들어볼까요?</p>
             {community}
             <p className='font-bold text-lg pb-2 pt-7'>다음과 같은 뉴스를 확인해볼 수 있어요.</p>
             {news}
             <p className='font-bold text-lg pb-2 pt-7'>다음과 같은 질문을 해볼 수 있어요.</p>
             {related_question}
+            <p className='pt-12 px-2 text-xs text-gray-500'>본 서비스는 wanted LaaS와 네이버의 HyperCLOVA X, HCX-DASH를 활용하여 개발되었습니다.</p>
+            <p className='pt-1 px-2 text-xs text-gray-500'>제한된 환경에서 서비스를 제공하고 있기에, 생성속도가 느릴 수 있습니다.</p>
           </div>
 
           </div>
@@ -300,6 +303,8 @@ function App() {
           <div className='w-full' id="howabout">
             <p id="howabout1" className='px-2 bg-emerald-50 border-1 p-1 my-2 rounded-lg hover:bg-emerald-100 active:bg-emerald-200' onClick={() => handleHowAboutClick(random1)}>{random1}</p>
             <p id="howabout2" className='px-2 bg-emerald-50 border-1 p-1 my-2 rounded-lg hover:bg-emerald-100 active:bg-emerald-200' onClick={() => handleHowAboutClick(random2)}>{random2}</p>
+            <p className='pt-4 px-2 text-xs text-gray-500'>본 서비스는 wanted LaaS와 네이버의 HyperCLOVA X, HCX-DASH를 활용하여 개발되었습니다.</p>
+            <p className='pt-1 px-2 text-xs text-gray-500'>제한된 환경에서 서비스를 제공하고 있기에, 생성속도가 느릴 수 있습니다.</p>
           </div>
         </div>
       </div>

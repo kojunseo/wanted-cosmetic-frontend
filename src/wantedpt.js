@@ -2,8 +2,8 @@ import axios  from "axios";
 
 class WantBase {
   constructor() {
-    this.apiUrl = "http://kojunseo.duckdns.org:9000";
-    // this.apiUrl = "http://59.5.15.36:22006";
+    // this.apiUrl = "http://kojunseo.duckdns.org:9000";
+    this.apiUrl = "http://localhost:9000";
   }
 }
 
