@@ -65,7 +65,7 @@ function App() {
     setStatus('관련된 수술을 찾고 있습니다.');
     setAnswer('답변 준비 중 입니다.')
     keyword = await search_keyword_chain.completions([], {question: userQuestion});
-    if (keyword === "33" || keyword===" "){
+    if (keyword === "34" || keyword===" "){
       // 질문이 잘못된 경우
       setStatus("해당 질문은 성형관련 질문이 아니거나, 답변할 수 없는 질문입니다. 다른 질문을 입력해주세요.");
       document.getElementById('loading-status').classList.remove('px-3');
