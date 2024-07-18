@@ -250,7 +250,7 @@ function App() {
 
   return (
     <div className='flex flex-col items-center justify-center md:h-screen bg-gradient-to-b from-slate-50 to-emerald-50' id="top-screen">
-      <div className='w-full md:w-2/3 bg-white rounded-lg p-8 md:p-20' id='top-screen-inner'>
+      <div className='w-full md:w-11/12 lg:w-2/3 bg-white rounded-lg p-8 md:p-20' id='top-screen-inner'>
         <div className='flex'>
           <img src={logo} alt="logo" className='w-10 h-10'/>
           <h1 className='text-2xl font-bold px-2'>나만의 성형 코디네이터</h1>
