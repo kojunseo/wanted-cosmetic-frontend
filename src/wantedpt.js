@@ -3,7 +3,7 @@ import axios  from "axios";
 class WantBase {
   constructor() {
     // this.apiUrl = "http://apicoord.kojunseo.duckdns.org";
-    this.apiUrl = "http://kojunseo.zapto.org:9000";
+    this.apiUrl = "http://apicoord.kojunseo.zapto.org";
   }
 }
 
@@ -22,7 +22,8 @@ class WantedChatCompletions extends WantBase {
       this.apiUrl+"/api", body
     );
     console.log(response);
-    const out = response.data.choices[0].message.content;
+    // const out = response.data.choices[0].message.content;
+    const out = response.data.data;
     return out;
   }
 
@@ -38,6 +39,7 @@ class WantedChatCompletions extends WantBase {
   }
 
   async get_context(keyword, index) {
+    console.log(keyword, index);
     const body = {
       keyword: keyword,
       index: index

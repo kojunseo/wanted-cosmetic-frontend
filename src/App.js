@@ -294,8 +294,8 @@ function App() {
             {news}
             <p className='font-bold text-lg pb-2 pt-7'>다음과 같은 질문을 해볼 수 있어요.</p>
             {related_question}
-            <p className='pt-12 px-2 text-xs text-gray-500'>본 서비스는 wanted LaaS와 네이버의 HyperCLOVA X, HCX-DASH를 활용하여 개발되었습니다.</p>
-            <p className='pt-1 px-2 text-xs text-gray-500'>제한된 환경에서 서비스를 제공하고 있기에, 생성속도가 느릴 수 있습니다.</p>
+            <p className='pt-12 px-2 text-xs text-gray-500'>본 서비스는 Google의 Gemini를 활용하여 개발되었습니다.</p>
+            {/* <p className='pt-1 px-2 text-xs text-gray-500'>제한된 환경에서 서비스를 제공하고 있기에, 생성속도가 느릴 수 있습니다.</p> */}
           </div>
 
           </div>
@@ -303,8 +303,8 @@ function App() {
           <div className='w-full' id="howabout">
             <p id="howabout1" className='px-2 bg-emerald-50 border-1 p-1 my-2 rounded-lg hover:bg-emerald-100 active:bg-emerald-200' onClick={() => handleHowAboutClick(random1)}>{random1}</p>
             <p id="howabout2" className='px-2 bg-emerald-50 border-1 p-1 my-2 rounded-lg hover:bg-emerald-100 active:bg-emerald-200' onClick={() => handleHowAboutClick(random2)}>{random2}</p>
-            <p className='pt-4 px-2 text-xs text-gray-500'>본 서비스는 wanted LaaS와 네이버의 HyperCLOVA X, HCX-DASH를 활용하여 개발되었습니다.</p>
-            <p className='pt-1 px-2 text-xs text-gray-500'>제한된 환경에서 서비스를 제공하고 있기에, 생성속도가 느릴 수 있습니다.</p>
+            <p className='pt-4 px-2 text-xs text-gray-500'>본 서비스는 Google의 Gemini를 활용하여 개발되었습니다.</p>
+            {/* <p className='pt-1 px-2 text-xs text-gray-500'>제한된 환경에서 서비스를 제공하고 있기에, 생성속도가 느릴 수 있습니다.</p> */}
           </div>
         </div>
       </div>
