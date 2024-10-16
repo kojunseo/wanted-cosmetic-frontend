@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import WantedChatCompletions from './wantedpt';
 import logo from './logo.png';
-
+import axios from 'axios';
 
 
 function App() {
-  
-  const search_keyword_chain = new WantedChatCompletions("01db023f6eccac2735b78757f1531f0a7be32d8e5a9d796ca69aa4a742b5da5f");
-  const document_index_search_chain = new WantedChatCompletions("1cbab7a71f89a0f4a1874c9b0c8abdc829164e44254614b856f8013d0c6d1bc5",);
-  const generation_chain = new WantedChatCompletions("47df1957fb5093fc089887263481f3a4ab1551fc1ea5dcbe29ba27c8f3d30241");
-  const related_question_chain = new WantedChatCompletions("571813f290f28d1fefd3964999d91198fc79621d63e7855f8ef8993e72285209");
+
   const [userQuestion, setUserQuestion] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [status, setStatus] = useState('');
@@ -64,8 +59,12 @@ function App() {
 
     setStatus('관련된 수술을 찾고 있습니다.');
     setAnswer('답변 준비 중 입니다.')
-    keyword = await search_keyword_chain.completions([], {question: userQuestion});
-    if (keyword === "34" || keyword===" "){
+    const response = await axios.post('https://l7h4b0abxc.execute-api.ap-northeast-2.amazonaws.com/keyword', {
+      question: userQuestion
+    });
+    keyword = response.data.index;
+    keyword_name = response.data.name;
+    if (keyword === '34' || keyword === ''){
       // 질문이 잘못된 경우
       setStatus("해당 질문은 성형관련 질문이 아니거나, 답변할 수 없는 질문입니다. 다른 질문을 입력해주세요.");
       document.getElementById('loading-status').classList.remove('px-3');
@@ -76,35 +75,34 @@ function App() {
       return;
     }
     
-    const document_index = await document_index_search_chain.completions([], {question: userQuestion});
-    context = await document_index_search_chain.get_context(keyword, document_index);
+    const document_index_response = await axios.post('https://l7h4b0abxc.execute-api.ap-northeast-2.amazonaws.com/index', {
+      question: userQuestion
+    });
     setCommunity('')
     setNews('')
     setRelatedQuestion('')
 
-    
-    keyword_name = await search_keyword_chain.get_keyword(keyword);
     setStatus(`'${keyword_name}'와 관련된 정보를 수집 중입니다.`);
     
-    const news_out = await search_keyword_chain.get_news(keyword);
-    setNews(
-      <div>
-        <div onClick={() => window.open(news_out.links[0], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
-          <p className='text-md font-semibold'>{news_out.titles[0]}</p>
-          <p className='text-sm pt-1 font-light'>요약내용: {news_out.result[0]}</p>
-        </div>
-        <div onClick={() => window.open(news_out.links[1], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
-          <p className='text-md font-semibold'>{news_out.titles[1]}</p>
-          <p className='text-sm pt-1 font-light'>요약내용: {news_out.result[1]}</p>
-        </div>
-        <div onClick={() => window.open(news_out.links[2], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
-          <p className='text-md font-semibold'>{news_out.titles[2]}</p>
-          <p className='text-sm pt-1 font-light'>요약내용: {news_out.result[2]}</p>
-        </div>   
-      </div>
-    )
+    // const news_out = await search_keyword_chain.get_news(keyword);
+    // setNews(
+    //   <div>
+    //     <div onClick={() => window.open(news_out.links[0], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
+    //       <p className='text-md font-semibold'>{news_out.titles[0]}</p>
+    //       <p className='text-sm pt-1 font-light'>요약내용: {news_out.result[0]}</p>
+    //     </div>
+    //     <div onClick={() => window.open(news_out.links[1], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
+    //       <p className='text-md font-semibold'>{news_out.titles[1]}</p>
+    //       <p className='text-sm pt-1 font-light'>요약내용: {news_out.result[1]}</p>
+    //     </div>
+    //     <div onClick={() => window.open(news_out.links[2], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
+    //       <p className='text-md font-semibold'>{news_out.titles[2]}</p>
+    //       <p className='text-sm pt-1 font-light'>요약내용: {news_out.result[2]}</p>
+    //     </div>   
+    //   </div>
+    // )
 
-    const community = await search_keyword_chain.get_community(keyword);
+    // const community = await search_keyword_chain.get_community(keyword);
     document.getElementById('answer').classList.remove('hidden');
     setAnswer(
       <div className='flex my-3 space-x-1' id='loading-spinner'>
@@ -120,27 +118,36 @@ function App() {
     document.getElementById('top-screen-inner').classList.add('md:py-8');
     
     
-    setCommunity(
-      <div>
-        <div onClick={() => window.open(community.links[0], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
-          <p className='text-md font-semibold'>{community.titles[0]}</p>
-          <p className='text-sm pt-1 font-light'>요약내용: {community.result[0]}</p>
-        </div>
-        <div onClick={() => window.open(community.links[1], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
-          <p className='text-md font-semibold'>{community.titles[1]}</p>
-          <p className='text-sm pt-1 font-light'>요약내용: {community.result[1]}</p>
-        </div>
-        <div onClick={() => window.open(community.links[2], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
-          <p className='text-md font-semibold'>{community.titles[2]}</p>
-          <p className='text-sm pt-1 font-light'>요약내용: {community.result[2]}</p>
-        </div>   
-      </div>
-    )
-    
-    const coord_answer = await generation_chain.completions([], {"question": userQuestion, "context": context})
+    // setCommunity(
+    //   <div>
+    //     <div onClick={() => window.open(community.links[0], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
+    //       <p className='text-md font-semibold'>{community.titles[0]}</p>
+    //       <p className='text-sm pt-1 font-light'>요약내용: {community.result[0]}</p>
+    //     </div>
+    //     <div onClick={() => window.open(community.links[1], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
+    //       <p className='text-md font-semibold'>{community.titles[1]}</p>
+    //       <p className='text-sm pt-1 font-light'>요약내용: {community.result[1]}</p>
+    //     </div>
+    //     <div onClick={() => window.open(community.links[2], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
+    //       <p className='text-md font-semibold'>{community.titles[2]}</p>
+    //       <p className='text-sm pt-1 font-light'>요약내용: {community.result[2]}</p>
+    //     </div>   
+    //   </div>
+    // )
+    context = document_index_response.data
+    const answer_response = await axios.post('https://l7h4b0abxc.execute-api.ap-northeast-2.amazonaws.com/generate', {
+      question: userQuestion,
+      surgery_index: keyword,
+      document_indices: document_index_response.data
+    });
     setStatus(`코디네이터가 '${keyword_name}'에 대한 내용을 정리 중 입니다.`);
-
-    const related_question = await related_question_chain.completions([], {"question": userQuestion, "context": context})
+    
+    const coord_answer = answer_response.data.answer;
+    const related_question_array = answer_response.data.related_questions;
+    const cost_text = answer_response.data.cost;
+    console.log(coord_answer)
+    console.log(related_question_array)
+    console.log(cost_text)
     
     document.getElementById('loading').classList.add('hidden');
     ScrollTop();
@@ -153,26 +160,19 @@ function App() {
 
     if (! coord_answer.includes("만원")){
       document.getElementById('cost-container').classList.remove('hidden');
-      const cost_text = await generation_chain.get_cost(keyword);
-      const cost_text_array = cost_text.split('\n');
+      console.log(cost_text)
       const cost_out = [];
-      for (let i = 0; i < cost_text_array.length; i++){
-        if (cost_text_array[i] === "") continue;
-        // <p className='text-md md:text-lg'>{cost_text[i]}</p>
-        const title = cost_text_array[i].split(":")[0];
-        const cost = cost_text_array[i].split(":")[1];
+
         cost_out.push(
           <div className='flex my-2 space-x-1'>
-            <p className='text-md font-semibold'>{title}:</p>
-            <p className='text-md'>{cost}</p>
+            <p className='text-md font-semibold'>{keyword_name}:</p>
+            <p className='text-md'>{cost_text}</p>
           </div>
         )
-        // cost_out.push(<p className='text-md md:text-lg font-semibold'>{cost}</p>)
-      }
-      setCost(cost_out);
+       setCost(cost_out);
     }
 
-    const related_question_array = related_question.split('\n');
+    // const related_question_array = related_question.split('\n');
     for (let i = 0; i < related_question_array.length; i++){
       // remove the first 2 characters if it starts with number
       if (related_question_array[i][0] in ['0', '1', '2', '3']){
@@ -220,7 +220,12 @@ function App() {
     document.getElementById('loading-status').classList.add('px-3');
     
     setStatus(`코디네이터가 추가 질문에 대한 답변을 준비하는 중입니다.`);
-    const coord_answer = await generation_chain.completions([], {"question": text, "context": context})
+    const coord_answer = await axios.post('https://l7h4b0abxc.execute-api.ap-northeast-2.amazonaws.com/generate', {
+      question: text,
+      surgery_index: keyword,
+      document_indices: context
+
+    });
     document.getElementById('loading').classList.add('hidden');
     ScrollTop();
     var out = '';
@@ -229,6 +234,7 @@ function App() {
       setAnswer(out)
       await new Promise(resolve => setTimeout(resolve, 5));
     }
+    console.log(out)
     
     
     // setAnswer(
@@ -282,7 +288,6 @@ function App() {
               <p className='font-bold text-lg pb-2 pt-8'>예상 수술 가격</p>
               <div className='bg-emerald-50 rounded-lg p-2'>
                 {cost}
-                {/* <p className='text-md md:text-lg'>{cost}</p> */}
               </div>
               
             </div>
@@ -303,7 +308,7 @@ function App() {
           <div className='w-full' id="howabout">
             <p id="howabout1" className='px-2 bg-emerald-50 border-1 p-1 my-2 rounded-lg hover:bg-emerald-100 active:bg-emerald-200' onClick={() => handleHowAboutClick(random1)}>{random1}</p>
             <p id="howabout2" className='px-2 bg-emerald-50 border-1 p-1 my-2 rounded-lg hover:bg-emerald-100 active:bg-emerald-200' onClick={() => handleHowAboutClick(random2)}>{random2}</p>
-            <p className='pt-4 px-2 text-xs text-gray-500'>본 서비스는 wanted LaaS와 네이버의 HyperCLOVA X, HCX-DASH를 활용하여 개발되었습니다.</p>
+            <p className='pt-4 px-2 text-xs text-gray-500'>본 서비스의 상업적 이용을 엄격하게 금합니다.</p>
             <p className='pt-1 px-2 text-xs text-gray-500'>제한된 환경에서 서비스를 제공하고 있기에, 생성속도가 느릴 수 있습니다.</p>
           </div>
         </div>
