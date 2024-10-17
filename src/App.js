@@ -59,7 +59,7 @@ function App() {
 
     setStatus('관련된 수술을 찾고 있습니다.');
     setAnswer('답변 준비 중 입니다.')
-    const response = await axios.post('https://l7h4b0abxc.execute-api.ap-northeast-2.amazonaws.com/keyword', {
+    const response = await axios.post('https://api-cosmetic.kojunseo.link/keyword', {
       question: userQuestion
     });
     keyword = response.data.index;
@@ -75,9 +75,13 @@ function App() {
       return;
     }
     
-    const document_index_response = await axios.post('https://l7h4b0abxc.execute-api.ap-northeast-2.amazonaws.com/index', {
+    const document_index_response = await axios.post('https://api-cosmetic.kojunseo.link/index', {
       question: userQuestion
     });
+    const alter_name_response = await axios.post('https://api-cosmetic.kojunseo.link/alter_name', {
+      surgery_index: keyword
+    });
+    const community_name = alter_name_response.data.community_name;
     setCommunity('')
     setNews('')
     setRelatedQuestion('')
@@ -85,22 +89,27 @@ function App() {
     setStatus(`'${keyword_name}'와 관련된 정보를 수집 중입니다.`);
     
     // const news_out = await search_keyword_chain.get_news(keyword);
-    // setNews(
-    //   <div>
-    //     <div onClick={() => window.open(news_out.links[0], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
-    //       <p className='text-md font-semibold'>{news_out.titles[0]}</p>
-    //       <p className='text-sm pt-1 font-light'>요약내용: {news_out.result[0]}</p>
-    //     </div>
-    //     <div onClick={() => window.open(news_out.links[1], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
-    //       <p className='text-md font-semibold'>{news_out.titles[1]}</p>
-    //       <p className='text-sm pt-1 font-light'>요약내용: {news_out.result[1]}</p>
-    //     </div>
-    //     <div onClick={() => window.open(news_out.links[2], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
-    //       <p className='text-md font-semibold'>{news_out.titles[2]}</p>
-    //       <p className='text-sm pt-1 font-light'>요약내용: {news_out.result[2]}</p>
-    //     </div>   
-    //   </div>
-    // )
+    const news_out = await axios.post('https://api-cosmetic.kojunseo.link/news', {
+      keyword: community_name
+    });
+     // shuffle news_out
+     const shuffled_news = news_out.data.sort(() => 0.5 - Math.random());
+    setNews(
+      <div>
+        <div onClick={() => window.open(shuffled_news[0].link, '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
+          <p className='text-md font-semibold'>{shuffled_news[0].title}</p>
+          <p className='text-sm pt-1 font-light'>{shuffled_news[0].content}</p>
+        </div>
+        <div onClick={() => window.open(shuffled_news[1].link, '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
+          <p className='text-md font-semibold'>{shuffled_news[1].title}</p>
+          <p className='text-sm pt-1 font-light'>{shuffled_news[1].content}</p>
+        </div>
+        <div onClick={() => window.open(shuffled_news[2].link, '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
+          <p className='text-md font-semibold'>{shuffled_news[2].title}</p>
+          <p className='text-sm pt-1 font-light'>{shuffled_news[2].content}</p>
+        </div>   
+      </div>
+    )
 
     // const community = await search_keyword_chain.get_community(keyword);
     document.getElementById('answer').classList.remove('hidden');
@@ -117,25 +126,32 @@ function App() {
     document.getElementById('top-screen-inner').classList.add('md:px-20');
     document.getElementById('top-screen-inner').classList.add('md:py-8');
     
+    const community_out = await axios.post('https://api-cosmetic.kojunseo.link/community', {
+      keyword: keyword_name
+    });
+    const shuffled_community = community_out.data.sort(() => 0.5 - Math.random());
+    console.log(shuffled_community)
+    setCommunity(
+      <div>
+        <div onClick={() => window.open(shuffled_community[0].link, '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
+          <p className='text-md font-semibold'>{shuffled_community[0].title}</p>
+          <p className='text-sm pt-1 font-light'>{shuffled_community[0].content}</p>
+        </div>
+        <div onClick={() => window.open(shuffled_community[1].link, '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
+          <p className='text-md font-semibold'>{shuffled_community[1].title}</p>
+          <p className='text-sm pt-1 font-light'>{shuffled_community[1].content}</p>
+        </div>
+        <div onClick={() => window.open(shuffled_community[2].link, '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
+          <p className='text-md font-semibold'>{shuffled_community[2].title}</p>
+          <p className='text-sm pt-1 font-light'>{shuffled_community[2].content}</p>
+        </div>   
+      </div>
+    )
     
-    // setCommunity(
-    //   <div>
-    //     <div onClick={() => window.open(community.links[0], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
-    //       <p className='text-md font-semibold'>{community.titles[0]}</p>
-    //       <p className='text-sm pt-1 font-light'>요약내용: {community.result[0]}</p>
-    //     </div>
-    //     <div onClick={() => window.open(community.links[1], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
-    //       <p className='text-md font-semibold'>{community.titles[1]}</p>
-    //       <p className='text-sm pt-1 font-light'>요약내용: {community.result[1]}</p>
-    //     </div>
-    //     <div onClick={() => window.open(community.links[2], '_blank')} className='hover:bg-emerald-100 active:bg-emerald-200 bg-emerald-50 p-2 rounded-lg my-2'>
-    //       <p className='text-md font-semibold'>{community.titles[2]}</p>
-    //       <p className='text-sm pt-1 font-light'>요약내용: {community.result[2]}</p>
-    //     </div>   
-    //   </div>
-    // )
+
+    
     context = document_index_response.data
-    const answer_response = await axios.post('https://l7h4b0abxc.execute-api.ap-northeast-2.amazonaws.com/generate', {
+    const answer_response = await axios.post('https://api-cosmetic.kojunseo.link/generate', {
       question: userQuestion,
       surgery_index: keyword,
       document_indices: document_index_response.data
@@ -220,7 +236,7 @@ function App() {
     document.getElementById('loading-status').classList.add('px-3');
     
     setStatus(`코디네이터가 추가 질문에 대한 답변을 준비하는 중입니다.`);
-    const coord_answer = await axios.post('https://l7h4b0abxc.execute-api.ap-northeast-2.amazonaws.com/generate', {
+    const coord_answer = await axios.post('https://api-cosmetic.kojunseo.link/generate', {
       question: text,
       surgery_index: keyword,
       document_indices: context
@@ -299,8 +315,9 @@ function App() {
             {news}
             <p className='font-bold text-lg pb-2 pt-7'>다음과 같은 질문을 해볼 수 있어요.</p>
             {related_question}
-            <p className='pt-12 px-2 text-xs text-gray-500'>본 서비스는 wanted LaaS와 네이버의 HyperCLOVA X, HCX-DASH를 활용하여 개발되었습니다.</p>
+            <p className='pt-12 px-2 text-xs text-gray-500'>본 서비스는 GPT-4o-mini, 성형시술가이드북을 활용하여 개발되었습니다.</p>
             <p className='pt-1 px-2 text-xs text-gray-500'>제한된 환경에서 서비스를 제공하고 있기에, 생성속도가 느릴 수 있습니다.</p>
+            <p className='pt-1 px-2 text-xs text-gray-500'>제작자 이메일: kojunseo@icloud.com</p>
           </div>
 
           </div>
@@ -308,8 +325,9 @@ function App() {
           <div className='w-full' id="howabout">
             <p id="howabout1" className='px-2 bg-emerald-50 border-1 p-1 my-2 rounded-lg hover:bg-emerald-100 active:bg-emerald-200' onClick={() => handleHowAboutClick(random1)}>{random1}</p>
             <p id="howabout2" className='px-2 bg-emerald-50 border-1 p-1 my-2 rounded-lg hover:bg-emerald-100 active:bg-emerald-200' onClick={() => handleHowAboutClick(random2)}>{random2}</p>
-            <p className='pt-4 px-2 text-xs text-gray-500'>본 서비스의 상업적 이용을 엄격하게 금합니다.</p>
+            <p className='pt-4 px-2 text-xs text-gray-500'>본 서비스는 GPT-4o-mini, 성형시술가이드북을 활용하여 개발되었습니다.</p>
             <p className='pt-1 px-2 text-xs text-gray-500'>제한된 환경에서 서비스를 제공하고 있기에, 생성속도가 느릴 수 있습니다.</p>
+            <p className='pt-1 px-2 text-xs text-gray-500'>제작자 이메일: kojunseo@icloud.com</p>
           </div>
         </div>
       </div>
